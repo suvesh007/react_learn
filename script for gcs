@@ -1,5 +1,5 @@
 adsdsdgfhjkl;;;lkjbn,m.
-
+https://minio.ecp-dev.gcpdns.internal.das/minio/anthemecp/
 ,nkl
 from minio import Minio
 from google.cloud import storage

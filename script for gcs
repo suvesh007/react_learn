@@ -48,3 +48,35 @@ def transfer_files():
 
 if __name__ == "__main__":
     transfer_files()
+
+
+########################
+import os
+from google.cloud import storage
+
+# --- Config ---
+LOCAL_FOLDER = "path/to/local/folder"
+GCS_BUCKET_NAME = "your-gcs-bucket"
+GCS_CREDENTIALS_PATH = "path/to/your-gcp-key.json"
+
+# Authenticate
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = GCS_CREDENTIALS_PATH
+gcs_client = storage.Client()
+gcs_bucket = gcs_client.bucket(GCS_BUCKET_NAME)
+
+def upload_folder_to_gcs(local_folder, gcs_bucket):
+    for root, _, files in os.walk(local_folder):
+        for file in files:
+            local_file_path = os.path.join(root, file)
+            # Get the relative path to preserve folder structure
+            relative_path = os.path.relpath(local_file_path, local_folder)
+            blob = gcs_bucket.blob(relative_path)
+
+            print(f"Uploading {relative_path} ...")
+            blob.upload_from_filename(local_file_path)
+
+    print("✅ All files uploaded.")
+
+if __name__ == "__main__":
+    upload_folder_to_gcs(LOCAL_FOLDER, gcs_bucket)
+

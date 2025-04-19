@@ -4,49 +4,47 @@ https://minio.ecp-dev.gcpdns.internal.das/minio/anthemecp/claimsol1/DBG_rule_cor
 ,nkl
 from minio import Minio
 from google.cloud import storage
-import os
 from io import BytesIO
+import os
 
-# --- MinIO Configuration ---
-MINIO_ENDPOINT = "play.min.io"  # Change this to your MinIO endpoint
-MINIO_ACCESS_KEY = "minio_access_key"
-MINIO_SECRET_KEY = "minio_secret_key"
-MINIO_BUCKET = "your-minio-bucket"
+# Configuration
+MINIO_ENDPOINT = "minio.ecp-dev.gcpdns.internal.das"
+MINIO_ACCESS_KEY = "your_minio_access_key"
+MINIO_SECRET_KEY = "your_minio_secret_key"
+MINIO_BUCKET = "anthemecp"
+MINIO_PREFIX = "claimsol1/DBG_rule_corpus_files/"
 
-# --- GCS Configuration ---
 GCS_BUCKET = "your-gcs-bucket"
 GCS_CREDENTIALS_PATH = "path/to/your-gcp-key.json"
 
-# Initialize MinIO client
+# Initialize clients
 minio_client = Minio(
     MINIO_ENDPOINT,
     access_key=MINIO_ACCESS_KEY,
     secret_key=MINIO_SECRET_KEY,
-    secure=True  # Set to False if not using HTTPS
+    secure=True
 )
 
-# Initialize GCS client
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = GCS_CREDENTIALS_PATH
 gcs_client = storage.Client()
 gcs_bucket = gcs_client.bucket(GCS_BUCKET)
 
 def transfer_files():
-    objects = minio_client.list_objects(MINIO_BUCKET, recursive=True)
+    objects = minio_client.list_objects(MINIO_BUCKET, prefix=MINIO_PREFIX, recursive=True)
     
     for obj in objects:
-        print(f"Downloading from MinIO: {obj.object_name}")
-        # Read file from MinIO
+        print(f"Downloading: {obj.object_name}")
         data = minio_client.get_object(MINIO_BUCKET, obj.object_name)
         file_data = BytesIO(data.read())
         data.close()
         data.release_conn()
 
-        # Upload to GCS
-        print(f"Uploading to GCS: {obj.object_name}")
+        # Uploading to GCS using the same path
         blob = gcs_bucket.blob(obj.object_name)
         blob.upload_from_file(file_data, rewind=True)
+        print(f"Uploaded: {obj.object_name}")
 
-    print("✅ All files transferred successfully!")
+    print("✅ Transfer complete.")
 
 if __name__ == "__main__":
     transfer_files()

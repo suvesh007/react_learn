@@ -1,5 +1,6 @@
 adsdsdgfhjkl;;;lkjbn,m.
 https://minio.ecp-dev.gcpdns.internal.das/minio/anthemecp/
+https://minio.ecp-dev.gcpdns.internal.das/minio/anthemecp/claimsol1/DBG_rule_corpus_files/
 ,nkl
 from minio import Minio
 from google.cloud import storage

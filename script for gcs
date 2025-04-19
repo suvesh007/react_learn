@@ -80,3 +80,22 @@ def upload_folder_to_gcs(local_folder, gcs_bucket):
 if __name__ == "__main__":
     upload_folder_to_gcs(LOCAL_FOLDER, gcs_bucket)
 
+import os
+
+def find_files_in_folder(base_path, target_folder_name):
+    matched_files = []
+
+    for root, dirs, files in os.walk(base_path):
+        if target_folder_name in os.path.basename(root):
+            for file in files:
+                matched_files.append(os.path.join(root, file))
+
+    return matched_files
+
+# Example usage:
+base_path = "/path/to/search"
+target_folder_name = "DBG_rule_corpus_files"
+files = find_files_in_folder(base_path, target_folder_name)
+
+for f in files:
+    print(f)
